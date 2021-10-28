@@ -71,7 +71,7 @@ public class MathTools {
 	
 	public static double[][] projectionMatrix = new double[][] {
 			{aspectRatio * fovScalingFactor, 0, 0, 0},
-			{0, fovScalingFactor, 0, 0},
+			{0, -fovScalingFactor, 0, 0},
 			{0, 0, zFar / (zFar - zNear), 1},
 			{0, 0, (-zNear * zNear) / (zFar - zNear), 0},
 	};
@@ -79,7 +79,7 @@ public class MathTools {
 	public static double[][] pointAtMatrix = new double[][] {};
 	public static double[][] lookAtMatrix = new double[][] {};
 	
-	//used for scaling a point up to the window size after projection
+	//used for scaling a normalized point up to the window size after projection
 	
 	public static Point3D scalePoint(Point3D p) {
 		Point3D ans = new Point3D(p);

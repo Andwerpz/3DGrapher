@@ -22,4 +22,35 @@ public class Point3D {
 		this.z += v.z;
 	}
 	
+	public void rotate(double radX, double radY, double radZ) {
+		rotateX(radX);
+		rotateY(radY);
+		rotateZ(radZ);
+	}
+	
+	public void rotateX(double xRot) {
+		double x = this.x;
+		double y = this.y;
+		double z = this.z;
+		this.x = x;
+		this.y = ((y * Math.cos(xRot)) + (z * -Math.sin(xRot)));
+		this.z = ((y * Math.sin(xRot)) + (z * Math.cos(xRot)));
+	}
+	public void rotateY(double yRot) {
+		double x = this.x;
+		double y = this.y;
+		double z = this.z;
+		this.x = (x * Math.cos(yRot)) + (z * Math.sin(yRot));
+		this.y = y;
+		this.z = (x * -Math.sin(yRot)) + (z * Math.cos(yRot));
+	}
+	public void rotateZ(double zRot) {
+		double x = this.x;
+		double y = this.y;
+		double z = this.z;
+		this.x = (x * Math.cos(zRot)) + (y * -Math.sin(zRot));
+		this.y = (x * Math.sin(zRot)) + (y * Math.cos(zRot));
+		this.z = z;
+	}
+	
 }
