@@ -22,7 +22,7 @@ public class Board {
 	public PerlinNoise pnMountains = new PerlinNoise(234, 0.1, 0.7, 15, 5);
 	public PerlinNoise pnMountainRoughness = new PerlinNoise(1230, 0.1, 2.5, 2, 5);
 	
-	public Vector3D cameraPos = new Vector3D(0, 10, 0);
+	public Vector3D cameraPos = new Vector3D(0, 5, 0);
 	public Vector3D cameraDir = new Vector3D(0, 0, 1);
 	public Vector3D lightDir = new Vector3D(0, -1, 0);
 	
@@ -33,12 +33,12 @@ public class Board {
 	
 	public java.awt.Point prevMouse = new java.awt.Point(0, 0);
 	
-	public double graphIncrement = 0.05;
+	public double graphIncrement = 0.2;
 	
-	public double graphMinX = -5;
-	public double graphMaxX = 5;
-	public double graphMinZ = -5;
-	public double graphMaxZ = 5;
+	public double graphMinX = -15;
+	public double graphMaxX = 15;
+	public double graphMinZ = -15;
+	public double graphMaxZ = 15;
 	
 	public boolean forward = false;
 	public boolean backward = false;
@@ -47,7 +47,7 @@ public class Board {
 	public boolean up = false;
 	public boolean down = false;
 	
-	public double moveSpeed = 0.21;
+	public double moveSpeed = 0.27;
 	
 	public boolean drawPoints = false;
 	public boolean drawFaces = true;
@@ -199,7 +199,10 @@ public class Board {
 					if(nextTri.avgMapY <= 0) {
 						nextColor = new Color(1, 120, 189);	//ocean, blue
 					}
-					else if(nextTri.avgMapY <= 0.05) {
+					else if(nextTri.maxYDiff > 0.30 && nextTri.avgMapY <= 3.5) {
+						nextColor = new Color(111, 125, 126);	//cliff, grey
+					}
+					else if(nextTri.avgMapY <= 0.05 && nextTri.maxYDiff <= 0.05) {
 						nextColor = new Color(250, 234, 183);	//sand, yellow
 					}
 					else if(nextTri.avgMapY <= 3){
@@ -385,6 +388,7 @@ class Triangle {
 	public Color color;
 	
 	public double avgMapY;	//y position in real space
+	public double maxYDiff;	//maximum difference in y in the 3 points
 	
 	public Triangle(Point3D p1, Point3D p2, Point3D p3) {
 		p = new Point3D[] {new Point3D(p1), new Point3D(p2), new Point3D(p3)};
@@ -392,6 +396,7 @@ class Triangle {
 		w = new double[3];
 		color = Color.WHITE;
 		avgMapY = (p[0].y + p[1].y + p[2].y) / 3d; 
+		maxYDiff = Math.max(Math.max(p[0].y, p[1].y), p[2].y)- Math.min(Math.min(p[0].y, p[1].y), p[2].y); 
 	}
 	
 }
