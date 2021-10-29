@@ -33,7 +33,7 @@ public class Board {
 	
 	public java.awt.Point prevMouse = new java.awt.Point(0, 0);
 	
-	public double graphIncrement = 0.2;
+	public double graphIncrement = 0.005;
 	
 	public double graphMinX = -15;
 	public double graphMaxX = 15;
@@ -113,14 +113,28 @@ public class Board {
 		ArrayList<ArrayList<Point3D>> graphPoints = new ArrayList<ArrayList<Point3D>>();
 		
 		//generate graph points
+		
+		double xRem = this.cameraPos.x % this.graphIncrement;
+		double yRem = this.cameraPos.z % this.graphIncrement;
+		
+		double xMultiple = this.cameraPos.x - xRem;
+		double yMultiple = this.cameraPos.z - yRem;
+//		xMultiple -= xMultiple % this.graphIncrement;
+//		yMultiple -= yMultiple % this.graphIncrement;
+		System.out.println(xMultiple + " " + yMultiple);
+		
+		
+		
 		for(double i = graphMinX; i <= graphMaxX; i += graphIncrement) {
 			graphPoints.add(new ArrayList<Point3D>());
 			for(double j = graphMinZ; j <= graphMaxZ; j += graphIncrement) {
 				
-				double x = i + this.cameraPos.x;
-				double z = j + this.cameraPos.z;
 				
-				Point3D nextPoint = new Point3D(i, Math.max(0, this.pnPlains.getHeight(x, z) * (this.pnMountains.getHeight(x, z) + this.pnMountainRoughness.getHeight(x, z))), j);
+				
+				double x = i + xMultiple;
+				double z = j + yMultiple;
+				
+				Point3D nextPoint = new Point3D(i - xRem, Math.max(0, this.pnPlains.getHeight(x, z) * (this.pnMountains.getHeight(x, z) + this.pnMountainRoughness.getHeight(x, z))), j - yRem);
 				
 				graphPoints.get(graphPoints.size() - 1).add(nextPoint);
 			}
