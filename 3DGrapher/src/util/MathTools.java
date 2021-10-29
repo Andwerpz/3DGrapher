@@ -120,6 +120,9 @@ public class MathTools {
 		
 		planeNormal.normalize();
 		
+		outTex = new ArrayList<Point[]>();
+		outW = new ArrayList<double[]>();
+		
 		ArrayList<Point3D> insidePoints = new ArrayList<Point3D>();
 		ArrayList<Point3D> outsidePoints = new ArrayList<Point3D>();
 		
