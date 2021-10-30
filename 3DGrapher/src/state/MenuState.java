@@ -67,7 +67,7 @@ public class MenuState extends State{
 
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
-
+		board.mouseClicked(arg0);
 	}
 
 	@Override

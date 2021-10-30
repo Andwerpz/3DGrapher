@@ -6,6 +6,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
+import button.ButtonManager;
+import button.SliderButton;
+import button.ToggleButton;
 import main.MainPanel;
 import util.MathTools;
 import util.PerlinNoise;
@@ -16,9 +19,9 @@ import util.Vector3D;
 
 public class Board {
 	
-	public String function = "x + 0.5z^2+5";
+	ButtonManager bm;
 	
-	public PerlinNoise pnPlains = new PerlinNoise(112, 1, 0.1, 1, 2);
+	public PerlinNoise pnOcean = new PerlinNoise(112, 1, 0.1, 1, 2);
 	public PerlinNoise pnMountains = new PerlinNoise(234, 0.1, 0.7, 15, 5);
 	public PerlinNoise pnMountainRoughness = new PerlinNoise(1230, 0.1, 2.5, 2, 5);
 	
@@ -33,7 +36,7 @@ public class Board {
 	
 	public java.awt.Point prevMouse = new java.awt.Point(0, 0);
 	
-	public double graphIncrement = 0.2;
+	public static double graphIncrement = 0.2;
 	
 	public double graphMinX = -15;
 	public double graphMaxX = 15;
@@ -53,10 +56,48 @@ public class Board {
 	public boolean drawFaces = true;
 
 	public Board() {
+		this.bm = new ButtonManager();
+		
+		bm.addToggleButton(new ToggleButton(690, 10, 100, 25, "Draw Faces"));						bm.toggleButtons.get(0).setToggled(true);
+		
+		bm.addSliderButton(new SliderButton(10, 30, 210, 10, 1, 200, "Ocean Seed"));		bm.sliderButtons.get(0).setVal(1);
+		bm.addSliderButton(new SliderButton(10, 60, 210, 10, 1, 200, "Ocean Frequency"));	bm.sliderButtons.get(1).setVal(1);
+		bm.addSliderButton(new SliderButton(10, 90, 210, 10, 1, 200, "Ocean Amplitude"));	bm.sliderButtons.get(2).setVal(13);
+		
+		bm.addSliderButton(new SliderButton(230, 30, 210, 10, 1, 200, "Mountains Seed"));		bm.sliderButtons.get(3).setVal(30);
+		bm.addSliderButton(new SliderButton(230, 60, 210, 10, 1, 200, "Mountains Frequency"));	bm.sliderButtons.get(4).setVal(7);
+		bm.addSliderButton(new SliderButton(230, 90, 210, 10, 1, 200, "Mountains Amplitude"));	bm.sliderButtons.get(5).setVal(81);
+		
+		bm.addSliderButton(new SliderButton(460, 30, 210, 10, 1, 200, "Roughness Seed"));		bm.sliderButtons.get(6).setVal(90);
+		bm.addSliderButton(new SliderButton(460, 60, 210, 10, 1, 200, "Roughness Frequency"));	bm.sliderButtons.get(7).setVal(48);
+		bm.addSliderButton(new SliderButton(460, 90, 210, 10, 1, 200, "Roughness Amplitude"));	bm.sliderButtons.get(8).setVal(87);
+		
+		
+		bm.addSliderButton(new SliderButton(10, 120, 210, 10, 1, 200, "Terrain Detail"));		bm.sliderButtons.get(9).setVal(5);
+		bm.addSliderButton(new SliderButton(230, 120, 210, 10, 1, 200, "Terrain Size"));		bm.sliderButtons.get(10).setVal(15);
+		
 		
 	}
 	
 	public void draw(Graphics g, java.awt.Point mouse) {
+		
+		this.bm.tick(mouse);
+		
+		//setting draw options
+		this.drawFaces = bm.toggleButtons.get(0).getToggled();
+		this.drawPoints = !bm.toggleButtons.get(0).getToggled();
+		
+		//setting seed based on sliders
+		this.pnOcean.set(bm.sliderButtons.get(0).getVal(), 1, (double) bm.sliderButtons.get(1).getVal() / 100d, (double) bm.sliderButtons.get(2).getVal() / 10d, 2);
+		this.pnMountains.set(bm.sliderButtons.get(3).getVal(), 1, (double) bm.sliderButtons.get(4).getVal() / 100d, (double) bm.sliderButtons.get(5).getVal() / 10d, 2);
+		this.pnMountainRoughness.set(bm.sliderButtons.get(6).getVal(), 1, (double) bm.sliderButtons.get(7).getVal() / 100d, (double) bm.sliderButtons.get(8).getVal() / 10d, 2);
+		
+		//setting terrain
+		Board.graphIncrement = 1d / (double) bm.sliderButtons.get(9).getVal();
+		this.graphMaxX = bm.sliderButtons.get(10).getVal();
+		this.graphMinX = -bm.sliderButtons.get(10).getVal();
+		this.graphMaxZ = bm.sliderButtons.get(10).getVal();
+		this.graphMinZ = -bm.sliderButtons.get(10).getVal();
 		
 		//****camera controls
 		
@@ -130,7 +171,7 @@ public class Board {
 				double x = i + xMultiple;
 				double z = j + yMultiple;
 				
-				Point3D nextPoint = new Point3D(i - xRem, Math.max(0, this.pnPlains.getHeight(x, z) * (this.pnMountains.getHeight(x, z) + this.pnMountainRoughness.getHeight(x, z))), j - yRem);
+				Point3D nextPoint = new Point3D(i - xRem, Math.max(0, this.pnOcean.getHeight(x, z) * (this.pnMountains.getHeight(x, z) + this.pnMountainRoughness.getHeight(x, z))), j - yRem);
 				
 				graphPoints.get(graphPoints.size() - 1).add(nextPoint);
 			}
@@ -209,10 +250,10 @@ public class Board {
 					if(nextTri.avgMapY <= 0) {
 						nextColor = new Color(1, 120, 189);	//ocean, blue
 					}
-					else if(nextTri.maxYDiff > 0.30 && nextTri.avgMapY <= 3.5) {
+					else if(nextTri.maxSlope > 1.5 && nextTri.avgMapY <= 3.5) {
 						nextColor = new Color(111, 125, 126);	//cliff, grey
 					}
-					else if(nextTri.avgMapY <= 0.05 && nextTri.maxYDiff <= 0.05) {
+					else if(nextTri.avgMapY <= 0.1 && nextTri.maxSlope <= 0.2) {
 						nextColor = new Color(250, 234, 183);	//sand, yellow
 					}
 					else if(nextTri.avgMapY <= 3){
@@ -312,7 +353,7 @@ public class Board {
 			}
 		}
 		
-		
+		this.bm.draw(g);
 		
 	}
 	
@@ -325,11 +366,21 @@ public class Board {
 	}
 	
 	public void mousePressed(MouseEvent arg0) {
+		this.bm.pressed(arg0);
+		if(this.bm.getPressed(arg0)) {
+			System.out.println("YES");
+			return;
+		}
 		this.mousePressed = true;
 	}
 	
 	public void mouseReleased(MouseEvent arg0) {
+		this.bm.mouseReleased();
 		this.mousePressed = false;
+	}
+	
+	public void mouseClicked(MouseEvent arg0) {
+		this.bm.buttonClicked(arg0);
 	}
 	
 	public void keyPressed(int k) {
@@ -398,7 +449,7 @@ class Triangle {
 	public Color color;
 	
 	public double avgMapY;	//y position in real space
-	public double maxYDiff;	//maximum difference in y in the 3 points
+	public double maxSlope;	
 	
 	public Triangle(Point3D p1, Point3D p2, Point3D p3) {
 		p = new Point3D[] {new Point3D(p1), new Point3D(p2), new Point3D(p3)};
@@ -406,7 +457,24 @@ class Triangle {
 		w = new double[3];
 		color = Color.WHITE;
 		avgMapY = (p[0].y + p[1].y + p[2].y) / 3d; 
-		maxYDiff = Math.max(Math.max(p[0].y, p[1].y), p[2].y)- Math.min(Math.min(p[0].y, p[1].y), p[2].y); 
+		
+		//get slope of plane defined by the triangle
+		
+		Vector3D v1 = new Vector3D(p[0], p[1]);
+		Vector3D v2 = new Vector3D(p[0], p[2]);
+		
+		Vector3D normal = MathTools.crossProduct(v1, v2);
+		normal.normalize();
+		
+		Vector3D maximumSlope = MathTools.crossProduct(normal, new Vector3D(1, 0, 0));
+		maximumSlope.normalize();
+		
+		double yDiff = Math.abs(maximumSlope.y);
+		double ang = Math.acos((yDiff));
+		double xDiff = Math.tan(ang) * yDiff;
+		
+		maxSlope = yDiff / xDiff;
+		
 	}
 	
 }
