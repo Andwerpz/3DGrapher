@@ -33,7 +33,7 @@ public class Board {
 	
 	public java.awt.Point prevMouse = new java.awt.Point(0, 0);
 	
-	public double graphIncrement = 0.005;
+	public double graphIncrement = 0.2;
 	
 	public double graphMinX = -15;
 	public double graphMaxX = 15;
@@ -119,10 +119,6 @@ public class Board {
 		
 		double xMultiple = this.cameraPos.x - xRem;
 		double yMultiple = this.cameraPos.z - yRem;
-//		xMultiple -= xMultiple % this.graphIncrement;
-//		yMultiple -= yMultiple % this.graphIncrement;
-		System.out.println(xMultiple + " " + yMultiple);
-		
 		
 		
 		for(double i = graphMinX; i <= graphMaxX; i += graphIncrement) {
