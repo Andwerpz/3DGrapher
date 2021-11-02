@@ -459,6 +459,8 @@ class Triangle {
 		avgMapY = (p[0].y + p[1].y + p[2].y) / 3d; 
 		
 		//get slope of plane defined by the triangle
+		//currently we just get the maximum out of the x and z slopes. 
+		//later, maybe we can get the maximum slope of the plane
 		
 		Vector3D v1 = new Vector3D(p[0], p[1]);
 		Vector3D v2 = new Vector3D(p[0], p[2]);
@@ -466,14 +468,25 @@ class Triangle {
 		Vector3D normal = MathTools.crossProduct(v1, v2);
 		normal.normalize();
 		
-		Vector3D maximumSlope = MathTools.crossProduct(normal, new Vector3D(1, 0, 0));
+		Vector3D maximumSlope = MathTools.crossProduct(normal, new Vector3D(0, 0, 1));
 		maximumSlope.normalize();
 		
 		double yDiff = Math.abs(maximumSlope.y);
 		double ang = Math.acos((yDiff));
 		double xDiff = Math.tan(ang) * yDiff;
 		
-		maxSlope = yDiff / xDiff;
+		double maxYSlope = yDiff / xDiff;
+		
+		maximumSlope = MathTools.crossProduct(normal, new Vector3D(1, 0, 0));
+		maximumSlope.normalize();
+		
+		yDiff = Math.abs(maximumSlope.y);
+		ang = Math.acos((yDiff));
+		xDiff = Math.tan(ang) * yDiff;
+		
+		double maxXSlope = yDiff / xDiff;
+		
+		maxSlope = Math.max(maxYSlope, maxXSlope);
 		
 	}
 	
