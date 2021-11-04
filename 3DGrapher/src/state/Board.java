@@ -22,8 +22,8 @@ public class Board {
 	ButtonManager bm;
 	
 	public PerlinNoise pnOcean = new PerlinNoise(112, 1, 0.1, 1, 2);
-	public PerlinNoise pnMountains = new PerlinNoise(234, 0.1, 0.7, 15, 5);
-	public PerlinNoise pnMountainRoughness = new PerlinNoise(1230, 0.1, 2.5, 2, 5);
+	public PerlinNoise pnMountains = new PerlinNoise(234, 0.1, 0.7, 15, 7);
+	public PerlinNoise pnMountainRoughness = new PerlinNoise(1230, 0.1, 2.5, 2, 10);
 	
 	public Vector3D cameraPos = new Vector3D(0, 5, 0);
 	public Vector3D cameraDir = new Vector3D(0, 0, 1);
