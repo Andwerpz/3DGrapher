@@ -250,10 +250,10 @@ public class Board {
 					if(nextTri.avgMapY <= 0) {
 						nextColor = new Color(1, 120, 189);	//ocean, blue
 					}
-					else if(nextTri.maxSlope > 1.5 && nextTri.avgMapY <= 3.5) {
+					else if(nextTri.angle > 55 && nextTri.avgMapY <= 3.5) {
 						nextColor = new Color(111, 125, 126);	//cliff, grey
 					}
-					else if(nextTri.avgMapY <= 0.1 && nextTri.maxSlope <= 0.2) {
+					else if(nextTri.avgMapY <= 0.1 && nextTri.angle <= 10) {
 						nextColor = new Color(250, 234, 183);	//sand, yellow
 					}
 					else if(nextTri.avgMapY <= 3){
@@ -449,7 +449,7 @@ class Triangle {
 	public Color color;
 	
 	public double avgMapY;	//y position in real space
-	public double maxSlope;	
+	public double angle;	//angle between this triangle and the ground
 	
 	public Triangle(Point3D p1, Point3D p2, Point3D p3) {
 		p = new Point3D[] {new Point3D(p1), new Point3D(p2), new Point3D(p3)};
@@ -458,35 +458,18 @@ class Triangle {
 		color = Color.WHITE;
 		avgMapY = (p[0].y + p[1].y + p[2].y) / 3d; 
 		
-		//get slope of plane defined by the triangle
-		//currently we just get the maximum out of the x and z slopes. 
-		//later, maybe we can get the maximum slope of the plane
+		Vector3D up = new Vector3D(0, 1, 0);	//vector pointing straight up
 		
-		Vector3D v1 = new Vector3D(p[0], p[1]);
-		Vector3D v2 = new Vector3D(p[0], p[2]);
+		Vector3D v1 = new Vector3D(p[0], p[2]);
+		Vector3D v2 = new Vector3D(p[0], p[1]);
 		
 		Vector3D normal = MathTools.crossProduct(v1, v2);
+		
 		normal.normalize();
 		
-		Vector3D maximumSlope = MathTools.crossProduct(normal, new Vector3D(0, 0, 1));
-		maximumSlope.normalize();
+		angle = Math.toDegrees(Math.acos(MathTools.dotProduct3D(up, normal)));
 		
-		double yDiff = Math.abs(maximumSlope.y);
-		double ang = Math.acos((yDiff));
-		double xDiff = Math.tan(ang) * yDiff;
-		
-		double maxYSlope = yDiff / xDiff;
-		
-		maximumSlope = MathTools.crossProduct(normal, new Vector3D(1, 0, 0));
-		maximumSlope.normalize();
-		
-		yDiff = Math.abs(maximumSlope.y);
-		ang = Math.acos((yDiff));
-		xDiff = Math.tan(ang) * yDiff;
-		
-		double maxXSlope = yDiff / xDiff;
-		
-		maxSlope = Math.max(maxYSlope, maxXSlope);
+		//System.out.println(angle);
 		
 	}
 	
